@@ -6,7 +6,6 @@ import CardContent from "@material-ui/core/CardContent";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import { fetchDynamicHint } from "./DynamicHintHelper";
 
 import { checkAnswer } from "../../platform-logic/checkAnswer.js";
 import styles from "./common-styles.js";
@@ -33,21 +32,20 @@ import {
     toastNotifyCorrectness, toastNotifyEmpty
 } from "./ToastNotifyCorrectness";
 import { joinList } from "../../util/formListString";
+import axios from "axios";
 import withTranslation from "../../util/withTranslation.js"
-import CryptoJS from "crypto-js";
 
 class ProblemCard extends React.Component {
     static contextType = ThemeContext;
 
     constructor(props, context) {
         super(props);
-        //console.log("problem lesson props:", props);
-
-        this.translate = props.translate
+        // console.log("problem lesson props:", props);
         this.step = props.step;
         this.index = props.index;
         this.giveStuFeedback = props.giveStuFeedback;
         this.giveStuHints = props.giveStuHints;
+        this.giveStuBottomHintOnly = props.giveStuBottomHintOnly;
         this.unlockFirstHint = props.unlockFirstHint;
         this.giveHintOnIncorrect = props.giveHintOnIncorrect
         this.keepMCOrder = props.keepMCOrder;
@@ -91,19 +89,12 @@ class ProblemCard extends React.Component {
             }
         }
 
+
         // Bottom out hints option
         if (
             this.giveStuBottomHint &&
             !(context.debug && context["use_expanded_view"])
         ) {
-            // Bottom out hints
-            this.hints.push({
-                id: this.step.id + "-h" + (this.hints.length + 1),
-                title: this.translate('hintsystem.answer'),
-                text: this.translate('hintsystem.answerIs') + this.step.stepAnswer,
-                type: "bottomOut",
-                dependencies: Array.from(Array(this.hints.length).keys()),
-            });
             // Bottom out sub hints
             this.hints.map((hint, i) => {
                 if (hint.type === "scaffold") {
@@ -117,8 +108,8 @@ class ProblemCard extends React.Component {
                             i +
                             "-s" +
                             (hint.subHints.length + 1),
-                        title: this.translate('hintsystem.answer'),
-                        text: this.translate('hintsystem.answerIs') + hint.hintAnswer[0],
+                        title: "Answer",
+                        text: "The answer is " + hint.hintAnswer[0],
                         type: "bottomOut",
                         dependencies: Array.from(
                             Array(hint.subHints.length).keys()
@@ -141,30 +132,8 @@ class ProblemCard extends React.Component {
             dynamicHint: "",
             bioInfo: "",
             enableHintGeneration: true,
-            activeHintType: "none", // "none", or "normal".
-            hints: this.hints,
-            // When we are currently streaming the response from ChatGPT, this variable is `true`
-            isGeneratingHint: false, 
-            lastAIHintHash: null,
         };
-
-         // This is used for AI hint generation
-         if (this.giveDynamicHint) {
-            const gptHint = {
-                id: this.step.id + "-h0",  // Unique ID for the GPT hint
-                title: "ChatGPT AI Hint",  // Translated title
-                text: "Loading...",
-                type: "gptHint",  // Custom type for GPT hint
-                dependencies: [],
-            };
-        
-            this.hints.unshift(gptHint);
-        }
     }
-
-    hashAnswer = (answer) => {
-        return CryptoJS.SHA256(answer).toString();
-    };
 
     _findHintId = (hints, targetId) => {
         for (var i = 0; i < hints.length; i++) {
@@ -176,7 +145,6 @@ class ProblemCard extends React.Component {
         return -1;
     };
 
-    // TODO: Incorporate this in the AI Hinting workflow
     updateBioInfo() {
         const bioInfo = JSON.parse(localStorage.getItem("bioInfo"));
         if (bioInfo) {
@@ -231,12 +199,13 @@ class ProblemCard extends React.Component {
             answerType,
             stepBody,
             stepTitle,
+            tolerance
         } = this.step;
         const { seed, problemVars, problemID, courseName, answerMade, lesson } =
             this.props;
 
         if (inputVal == '') {
-            toastNotifyEmpty(this.translate)
+            toastNotifyEmpty()
             return;
         }
 
@@ -250,9 +219,12 @@ class ProblemCard extends React.Component {
                 seed
             ),
             questionText: stepBody.trim() || stepTitle.trim(),
+            tolerance: tolerance
         });
 
         const isCorrect = !!correctAnswer;
+        this.expandFirstIncorrect = true;
+        this.toggleHints('auto-expand');
 
         this.context.firebase.log(
             parsed,
@@ -274,16 +246,16 @@ class ProblemCard extends React.Component {
         );
 
         if (this.showCorrectness) {
-            toastNotifyCorrectness(isCorrect, reason, this.translate);
+            toastNotifyCorrectness(isCorrect, reason);
         } else {
-            toastNotifyCompletion(this.translate);
+            toastNotifyCompletion();
         }
 
         this.setState({
             isCorrect,
             checkMarkOpacity: isCorrect ? "100" : "0",
         });
-        answerMade(this.index, knowledgeComponents, isCorrect);
+        answerMade(this.index, knowledgeComponents, isCorrect, this.step.id);
     };
 
     editInput = (event) => {
@@ -307,26 +279,24 @@ class ProblemCard extends React.Component {
     };
 
     toggleHints = (event) => {
-        if (this.giveDynamicHint && !this.state.activeHintType !== "normal") {
-            this.generateHintFromGPT();
-        } else if (!this.state.displayHints) {
+        this.setState({
+            enableHintGeneration: false,
+        });
+        if (!this.state.displayHints) {
             this.setState(
-                () => ({
-                    enableHintGeneration: false,
-            }))
-        }
-        this.setState(
-            (prevState) => ({
-                activeHintType: prevState.activeHintType === "normal" ? "none" : "normal"
+                (prevState) => ({
+                    displayHints: !prevState.displayHints,
                 }),
-            () => {
-                this.props.answerMade(
-                    this.index,
-                    this.step.knowledgeComponents,
-                    false
-                );
-            }
-        );
+                () => {
+                    this.props.answerMade(
+                        this.index,
+                        this.step.knowledgeComponents,
+                        false,
+                        this.step.id
+                    );
+                }
+            );
+        }
     };
 
     unlockHint = (hintNum, hintType) => {
@@ -338,7 +308,7 @@ class ProblemCard extends React.Component {
 
         if (hintsFinished.reduce((a, b) => a + b) === 0 && isCorrect !== true) {
             this.setState({ usedHints: true });
-            answerMade(this.index, knowledgeComponents, false);
+            answerMade(this.index, knowledgeComponents, false, this.step.id);
         }
 
         // If the user has not opened a scaffold before, mark it as in-progress.
@@ -406,213 +376,37 @@ class ProblemCard extends React.Component {
     };
 
     generateGPTHintParameters = (prompt_template, bio_info) => {
-        let inputVal = this.state.inputVal || "The student did not provide an answer.";
-        let correctAnswer = Array.isArray(this.step.stepAnswer) ? this.step.stepAnswer[0] : "";
-        const problemTitle = this.problemTitle || "Problem Title";
-        const problemSubTitle = this.problemSubTitle || "Problem Subtitle";
-        const questionTitle = this.step.stepTitle || "Question Title";
-        const questionSubTitle = this.step.stepBody || "Question Subtitle";
+        var inputVal = "";
+        if (
+            typeof this.state.inputVal === "string" &&
+            this.state.inputVal.length > 0
+        ) {
+            inputVal = this.state.inputVal;
+        }
+        var correctAnswer = "";
+        if (
+            Array.isArray(this.step.stepAnswer) &&
+            this.step.stepAnswer.length > 0
+        ) {
+            correctAnswer = this.step.stepAnswer[0];
+        }
 
-        // Replace placeholders in the template with actual values
-        const promptContent = prompt_template
-            .replace("{problem_title}", problemTitle)
-            .replace("{problem_subtitle}", problemSubTitle)
-            .replace("{question_title}", questionTitle)
-            .replace("{question_subtitle}", questionSubTitle)
-            .replace("{student_answer}", inputVal)
-            .replace("{correct_answer}", correctAnswer);
-        return  {
-            role: "user",
-            message: promptContent
-            }
+        var quest = {
+            problem_title: this.problemTitle,
+            problem_subtitle: this.problemSubTitle,
+            question_title: this.step.stepTitle,
+            question_subtitle: this.step.stepBody,
+            student_answer: inputVal,
+            correct_answer: correctAnswer,
         };
 
-    generateHintFromGPT = async (forceRegenerate) => {
-        const { inputVal, lastAIHintHash, isGeneratingHint } = this.state;
-
-        const currentHash = this.hashAnswer(inputVal);
-
-        // If a hint is currently being generated through streaming, 
-        // do not generate a new hint
-        if (isGeneratingHint) {
-            return;
-        }
-
-        // If the current hash matches the last hash, skip regeneration
-        // If forceRegenerate is true, the regenerate button was pressed
-        if ((currentHash === lastAIHintHash) && !forceRegenerate) {
-            console.log("Hint already generated for this answer, skipping regeneration.");
-            return;
-        }
-
-        this.setState({
-            dynamicHint: "Loading...", // Clear previous hint
-            isGeneratingHint: true,
-            lastAIHintHash: currentHash,
-        });
-    
-        const [parsed, correctAnswer, reason] = checkAnswer({
-            attempt: this.state.inputVal,
-            actual: this.step.stepAnswer,
-            answerType: this.step.answerType,
-            precision: this.step.precision,
-            variabilization: chooseVariables(
-                Object.assign(
-                    {},
-                    this.props.problemVars,
-                    this.props.variabilization
-                ),
-                this.props.seed
-            ),
-            questionText:
-                this.step.stepBody.trim() || this.step.stepTitle.trim(),
-        });
-    
-        const isCorrect = !!correctAnswer;
-    
-        // Define callbacks
-        const onChunkReceived = (streamedHint) => {
-            this.setState((prevState) => ({
-                hints: prevState.hints.map((hint) =>
-                    hint.type === "gptHint"
-                        ? { ...hint, text: streamedHint || this.translate("hintsystem.errorHint") }
-                        : hint
-                ),
-            }));
-        };
-
-        /** When the hint generation is completed, set the `isGeneratingHint` state to false
-         * in order to regenerate the hint.
-         */
-        const onSuccessfulCompletion = () => {
-            this.setState({
-                isGeneratingHint: false,
-            });
-        }
-    
-        /** When we receive an error in the hint generation process,
-         *  revert back to manual hints.
-         */
-        const onError = (error) => {
-            this.setState({
-                isGeneratingHint: false,
-            })
-            console.error("Error generating AI hint:", error);
-        
-            this.hints = JSON.parse(
-                JSON.stringify(this.step.hints[this.context.hintPathway])
-            );
-            for (let hint of this.hints) {
-                hint.dependencies = hint.dependencies.map((dependency) =>
-                    this._findHintId(this.hints, dependency)
-                );
-                if (hint.subHints) {
-                    for (let subHint of hint.subHints) {
-                        subHint.dependencies = subHint.dependencies.map(
-                            (dependency) =>
-                                this._findHintId(hint.subHints, dependency)
-                        );
-                    }
-                }
-            }
-
-                // Bottom out hints option
-            if (
-                this.giveStuBottomHint
-            ) {
-                // Bottom out hints
-                this.hints.push({
-                    id: this.step.id + "-h" + (this.hints.length + 1),
-                    title: this.translate('hintsystem.answer'),
-                    text: this.translate('hintsystem.answerIs') + this.step.stepAnswer,
-                    type: "bottomOut",
-                    dependencies: Array.from(Array(this.hints.length).keys()),
-                });
-                // Bottom out sub hints
-                this.hints.map((hint, i) => {
-                    if (hint.type === "scaffold") {
-                        if (hint.subHints == null) {
-                            hint.subHints = [];
-                        }
-                        hint.subHints.push({
-                            id:
-                                this.step.id +
-                                "-h" +
-                                i +
-                                "-s" +
-                                (hint.subHints.length + 1),
-                            title: this.translate('hintsystem.answer'),
-                            text: this.translate('hintsystem.answerIs') + hint.hintAnswer[0],
-                            type: "bottomOut",
-                            dependencies: Array.from(
-                                Array(hint.subHints.length).keys()
-                            ),
-                        });
-                    }
-                    return null;
-                });
-            }
-        
-            this.setState({
-                hints: this.hints,
-                giveDynamicHint: false, // Switch to manual hints
-                activeHintType: "normal",
-                dynamicHint: "Failed to generate AI hint. Displaying manual hints.",
-                hintsFinished: new Array(this.hints.length).fill(0),
-            });
-        };            
-    
-        // Call ChatGPT to fetch the dynamic hint using streaming
-        fetchDynamicHint(
-            DYNAMIC_HINT_URL,
-            this.generateGPTHintParameters(this.prompt_template, this.state.bioInfo),
-            onChunkReceived,
-            onSuccessfulCompletion,
-            onError,
-            this.props.problemID,
-            chooseVariables(
-                Object.assign(
-                    {},
-                    this.props.problemVars,
-                    this.step.variabilization
-                ),
-                this.props.seed
-            ),
-            this.context
-        );
-    
-        // TODO: Update firebase logging to log when
-        // 1. The dynamic hint is opened
-        // 2. The regenerate button is clicked
-        this.context.firebase.log(
-            parsed,
-            this.props.problemID,
-            this.step,
-            "",
-            isCorrect,
-            this.state.hintsFinished,
-            "requestDynamicHint",
-            chooseVariables(
-                Object.assign(
-                    {},
-                    this.props.problemVars,
-                    this.props.variabilization
-                ),
-                this.props.seed
-            ),
-            this.props.lesson,
-            this.props.courseName,
-            "dynamic",
-            this.state.dynamicHint,
-            this.state.bioInfo
-        );
+        return { quest, prompt_template, bio_info };
     };
-        
 
     render() {
         const { translate } = this.props;
         const { classes, problemID, problemVars, seed } = this.props;
-        const { isCorrect } = this.state;
+        const { displayHints, isCorrect } = this.state;
         const { debug, use_expanded_view } = this.context;
 
         const problemAttempted = isCorrect != null;
@@ -652,7 +446,35 @@ class ProblemCard extends React.Component {
                             this.context
                         )}
                     </div>
-                    {(this.state.activeHintType === "normal" || (debug && use_expanded_view)) &&
+                    {displayHints && this.giveDynamicHint && (
+                        <div className="dynamicHintContainer">
+                            <h3 className="dynamicHintTitle">
+                                Hint From ChatGPT
+                            </h3>
+                            {this.state.dynamicHint ? (
+                                <div className="dynamicHintContent">
+                                    {renderText(
+                                        this.state.dynamicHint,
+                                        problemID,
+                                        chooseVariables(
+                                            Object.assign(
+                                                {},
+                                                problemVars,
+                                                this.step.variabilization
+                                            ),
+                                            seed
+                                        ),
+                                        this.context
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="dynamicHintContent">
+                                    loading...
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {(displayHints || (debug && use_expanded_view)) &&
                         this.showHints && (
                             <div className="Hints">
                                 <ErrorBoundary
@@ -660,7 +482,6 @@ class ProblemCard extends React.Component {
                                     descriptor={"hint"}
                                 >
                                     <HintSystem
-                                        key={`hints-${this.giveDynamicHint ? 'dynamic' : 'manual'}`}
                                         giveHintOnIncorrect={this.giveHintOnIncorrect}
                                         giveDynamicHint={this.giveDynamicHint}
                                         giveStuFeedback={this.giveStuFeedback}
@@ -668,7 +489,7 @@ class ProblemCard extends React.Component {
                                         problemID={this.props.problemID}
                                         index={this.props.index}
                                         step={this.step}
-                                        hints={this.state.hints}
+                                        hints={this.hints}
                                         unlockHint={this.unlockHint}
                                         hintStatus={this.state.hintsFinished}
                                         submitHint={this.submitHint}
@@ -682,8 +503,6 @@ class ProblemCard extends React.Component {
                                         lesson={this.props.lesson}
                                         courseName={this.props.courseName}
                                         isIncorrect={this.expandFirstIncorrect}
-                                        generateHintFromGPT={this.generateHintFromGPT}
-                                        isGeneratingHint={this.state.isGeneratingHint}
                                     />
                                 </ErrorBoundary>
                                 <Spacer />
@@ -727,32 +546,6 @@ class ProblemCard extends React.Component {
                     >
                         <Grid item xs={false} sm={false} md={4} />
                         <Grid item xs={4} sm={4} md={1}>
-                            {this.showHints && (
-                                <center>
-                                    <IconButton
-                                        aria-label="delete"
-                                        onClick={this.toggleHints}
-                                        title="View available hints"
-                                        disabled={
-                                            !this.state.enableHintGeneration
-                                        }
-                                        className="image-container"
-                                        {...stagingProp({
-                                            "data-selenium-target": `hint-button-${this.props.index}`,
-                                        })}
-                                    >
-                                        <img
-                                            src={`${process.env.PUBLIC_URL}/static/images/icons/raise_hand.png`}
-                                            className={
-                                                this.state.enableHintGeneration
-                                                    ? "image"
-                                                    : "image image-grayed-out"
-                                            }
-                                            alt="hintToggle"
-                                        />
-                                    </IconButton>
-                                </center>
-                            )}
                         </Grid>
                         <Grid item xs={4} sm={4} md={2}>
                             <center>

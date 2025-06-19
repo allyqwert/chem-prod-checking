@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import ProblemCardWrapper from "./ProblemCardWrapper";
+import ProblemCard from "./ProblemCard";
 import Grid from "@material-ui/core/Grid";
 import { animateScroll as scroll, Element, scroller } from "react-scroll";
 import update from "../../models/BKT/BKT-brain.js";
@@ -32,40 +32,31 @@ import ToastID from "../../util/toastIds";
 import Spacer from "../Spacer";
 import { stagingProp } from "../../util/addStagingProperty";
 import { cleanArray } from "../../util/cleanObject";
-import Popup from '../Popup/Popup.js';
-import About from '../../pages/Posts/About.js';
 
 class Problem extends React.Component {
-    static defaultProps = {
-        autoScroll: true
-      };
     static contextType = ThemeContext;
 
     constructor(props, context) {
         super(props);
-
-        const { setLanguage } = props;
-        if (props.lesson.courseName == "Matematik 4") {
-            setLanguage('se')
-        }
-
+        this.completedSteps = new Set();
         this.bktParams = context.bktParams;
         this.heuristic = context.heuristic;
 
         const giveStuFeedback = this.props.lesson?.giveStuFeedback;
         const giveStuHints = this.props.lesson?.giveStuHints;
+        const giveStuBottomHintOnly = this.props.lesson?.giveStuBottomHintOnly;
         const keepMCOrder = this.props.lesson?.keepMCOrder;
-        const giveHintOnIncorrect = this.props.lesson?.giveHintOnIncorrect;
         const keyboardType = this.props.lesson?.keyboardType;
         const doMasteryUpdate = this.props.lesson?.doMasteryUpdate;
         const unlockFirstHint = this.props.lesson?.unlockFirstHint;
         const giveStuBottomHint = this.props.lesson?.allowBottomHint;
 
-        this.giveHintOnIncorrect = giveHintOnIncorrect != null && giveHintOnIncorrect;
+        this.giveHintOnIncorrect = true;
         this.giveStuFeedback = giveStuFeedback == null || giveStuFeedback;
         this.keepMCOrder = keepMCOrder != null && keepMCOrder;
         this.keyboardType = keyboardType != null && keyboardType;
         this.giveStuHints = giveStuHints == null || giveStuHints;
+        this.giveStuBottomHintOnly = giveStuBottomHintOnly == null || giveStuBottomHintOnly
         this.doMasteryUpdate = doMasteryUpdate == null || doMasteryUpdate;
         this.unlockFirstHint = unlockFirstHint != null && unlockFirstHint;
         this.giveStuBottomHint = giveStuBottomHint == null || giveStuBottomHint;
@@ -81,7 +72,6 @@ class Problem extends React.Component {
             showFeedback: false,
             feedback: "",
             feedbackSubmitted: false,
-            showPopup: false
         };
     }
 
@@ -122,6 +112,7 @@ class Problem extends React.Component {
                     }),
                 })
             );
+            
             if (err || !response) {
                 toast.error(
                     `An unknown error occurred trying to submit this problem. If reloading does not work, please contact us.`,
@@ -226,9 +217,9 @@ class Problem extends React.Component {
         }
     };
 
-    answerMade = (cardIndex, kcArray, isCorrect) => {
+    answerMade = async (cardIndex, kcArray, isCorrect, stepId) => {
         const { stepStates, firstAttempts } = this.state;
-        const { lesson, problem } = this.props;
+        const { lesson, problem, completedSteps, updateCompletedSteps } = this.props;
 
         console.debug(`answer made and is correct: ${isCorrect}`);
 
@@ -262,24 +253,27 @@ class Problem extends React.Component {
             }
         }
 
-        if (!this.context.debug) {
+        if (!this.context.debug && isCorrect) {
+            const newCompletedSteps = new Set(completedSteps);
+            if(stepId) {
+                newCompletedSteps.add(stepId);
+            }
+    
+            await updateCompletedSteps(newCompletedSteps);
+
             const objectives = Object.keys(lesson.learningObjectives);
             objectives.unshift(0);
-            let score = objectives.reduce((x, y) => {
-                return x + this.bktParams[y].probMastery;
-            });
-            score /= objectives.length - 1;
-            //console.log(this.context.studentName + " " + score);
-            this.props.displayMastery(score);
+            let numberOfCompletedSteps = newCompletedSteps.size;
+            let score = (numberOfCompletedSteps * 100) / 22;
+            score /= 100
 
             const relevantKc = {};
             Object.keys(lesson.learningObjectives).forEach((x) => {
                 relevantKc[x] = this.bktParams[x].probMastery;
             });
 
-            this.updateCanvas(score, relevantKc);
-        }
-
+            //this.updateCanvas(0.0, relevantKc);
+        } 
         const nextStepStates = {
             ...stepStates,
             [cardIndex]: isCorrect,
@@ -317,13 +311,11 @@ class Problem extends React.Component {
                     "not last step so not done w/ problem, step states:",
                     nextStepStates
                 );
-                if (this.props.autoScroll) {
-                    scroller.scrollTo((cardIndex + 1).toString(), {
-                        duration: 500,
-                        smooth: true,
-                        offset: -100,
-                    });
-                }
+                scroller.scrollTo((cardIndex + 1).toString(), {
+                    duration: 500,
+                    smooth: true,
+                    offset: -100,
+                });
                 this.setState({
                     stepStates: nextStepStates,
                 });
@@ -370,13 +362,6 @@ class Problem extends React.Component {
         scroll.scrollToBottom({ duration: 500, smooth: true });
         this.setState((prevState) => ({
             showFeedback: !prevState.showFeedback,
-        }));
-    };
-    
-    togglePopup = () => {
-        console.log("Toggling popup visibility");
-        this.setState((prevState) => ({
-          showPopup: !prevState.showPopup,
         }));
     };
 
@@ -432,7 +417,6 @@ class Problem extends React.Component {
         const { classes, problem, seed } = this.props;
         const [oerLink, oerName, licenseLink, licenseName] =
             this.getOerLicense();
-        const { showPopup } = this.state;
         if (problem == null) {
             return <div></div>;
         }
@@ -481,19 +465,20 @@ class Problem extends React.Component {
                                 name={idx.toString()}
                                 key={`${problem.id}-${step.id}`}
                             >
-                                <ProblemCardWrapper
+                                <ProblemCard
                                     problemID={problem.id}
                                     step={step}
                                     index={idx}
                                     answerMade={this.answerMade}
                                     seed={seed}
                                     problemVars={problem.variabilization}
-                                    lesson={problem.lesson}
+                                    lesson={this.props.lesson.name}
                                     courseName={problem.courseName}
                                     problemTitle={problem.title}
                                     problemSubTitle={problem.body}
                                     giveStuFeedback={this.giveStuFeedback}
                                     giveStuHints={this.giveStuHints}
+                                    giveStuBottomHintOnly={this.giveStuBottomHintOnly}
                                     keepMCOrder={this.keepMCOrder}
                                     keyboardType={this.keyboardType}
                                     giveHintOnIncorrect={
@@ -635,9 +620,9 @@ class Problem extends React.Component {
                             }}
                         >
                             <IconButton
-                                aria-label="about"
-                                title={`About ${SITE_NAME}`}
-                                onClick={this.togglePopup}
+                                aria-label="help"
+                                title={`How to use ${SITE_NAME}?`}
+                                href={`${window.location.origin}${window.location.pathname}#/posts/how-to-use`}
                             >
                                 <HelpOutlineOutlinedIcon
                                     htmlColor={"#000"}
@@ -660,9 +645,6 @@ class Problem extends React.Component {
                                 />
                             </IconButton>
                         </div>
-                        <Popup isOpen={showPopup} onClose={this.togglePopup}>
-                            <About />
-                        </Popup>
                     </div>
                     {this.state.showFeedback ? (
                         <div className="Feedback">

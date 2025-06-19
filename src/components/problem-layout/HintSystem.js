@@ -16,7 +16,6 @@ import Spacer from "../Spacer";
 import { stagingProp } from "../../util/addStagingProperty";
 import ErrorBoundary from "../ErrorBoundary";
 import withTranslation from '../../util/withTranslation';
-import ReloadIcon from './ReloadIcon';
 
 class HintSystem extends React.Component {
     static contextType = ThemeContext;
@@ -39,7 +38,7 @@ class HintSystem extends React.Component {
         this.unlockFirstHint = props.unlockFirstHint;
         this.isIncorrect = props.isIncorrect;
         this.giveHintOnIncorrect = props.giveHintOnIncorrect
-        this.generateHintFromGPT = props.generateHintFromGPT;
+
         this.state = {
             latestStep: 0,
             currentExpanded: (this.unlockFirstHint || this.isIncorrect) ? 0 : -1,
@@ -50,15 +49,13 @@ class HintSystem extends React.Component {
 
         if (this.unlockFirstHint && this.props.hintStatus.length > 0) {
             this.props.unlockHint(0, this.props.hints[0].type);
-        }
-
-        if (this.giveHintOnIncorrect && this.isIncorrect && this.props.hintStatus.length > 0) {
+        } else if (this.giveHintOnIncorrect && this.isIncorrect && this.props.hintStatus.length > 0) {
             this.props.unlockHint(0, this.props.hints[0].type);
         }
     }
 
     unlockHint = (event, expanded, i) => {
-        if (this.state.currentExpanded === i ) {
+        if (this.state.currentExpanded === i) {
             this.setState({ currentExpanded: -1 });
         } else {
             this.setState({ currentExpanded: i });
@@ -80,13 +77,11 @@ class HintSystem extends React.Component {
         return !isSatisfied;
     };
 
-    
-
     toggleSubHints = (event, i) => {
         this.setState(
             (prevState) => {
                 var displayHints = prevState.showSubHints;
-                displayHints[i] = !displayHints[i];
+                displayHints[i] = true;
                 return {
                     showSubHints: displayHints,
                 };
@@ -107,20 +102,6 @@ class HintSystem extends React.Component {
                 prevState.subHintsFinished[i][hintNum] = !isScaffold ? 1 : 0.5;
                 return { subHintsFinished: prevState.subHintsFinished };
             },
-            () => {
-                this.context.firebase.log(
-                    null,
-                    this.props.problemID,
-                    this.step,
-                    null,
-                    null,
-                    this.state.subHintsFinished,
-                    "unlockSubHint",
-                    chooseVariables(this.props.stepVars, this.props.seed),
-                    this.props.lesson,
-                    this.props.courseName
-                );
-            }
         );
     };
 
@@ -198,8 +179,7 @@ class HintSystem extends React.Component {
                                 )}
                             </Typography>
                         </AccordionSummary>
-                        <AccordionDetails >
-                        <div style={{ width: "100%" }}>
+                        <AccordionDetails>
                             <Typography
                                 component={"span"}
                                 style={{ width: "100%" }}
@@ -282,27 +262,6 @@ class HintSystem extends React.Component {
                                     ""
                                 )}
                             </Typography>
-                             {/* Check if the hint is dynamic (AI-generated) */}
-                             {hint.type === "gptHint" 
-                                && !this.props.isGeneratingHint
-                                && (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "flex-end",
-                                    }}
-                                >
-                                    <ReloadIcon
-                                        style={{
-                                            cursor: "pointer",
-                                            fontSize: "24px",
-                                        }}
-                                        onClick={() => this.generateHintFromGPT(true)}
-                                        title="Regenerate Hint"
-                                    />
-                                </div>
-                            )}
-                            </div>
                         </AccordionDetails>
                     </Accordion>
                 ))}

@@ -11,7 +11,6 @@ import ProblemInput from "../problem-input/ProblemInput";
 import { stagingProp } from "../../util/addStagingProperty";
 import { toastNotifyCorrectness } from "./ToastNotifyCorrectness";
 import { joinList } from "../../util/formListString";
-import withTranslation from "../../util/withTranslation.js"
 import {
     toastNotifyEmpty
 } from "./ToastNotifyCorrectness";
@@ -21,7 +20,6 @@ class HintTextbox extends React.Component {
 
     constructor(props, context) {
         super(props);
-        this.translate = props.translate
         this.hint = props.hint;
         this.index = props.index;
         this.giveStuFeedback = props.giveStuFeedback
@@ -48,19 +46,22 @@ class HintTextbox extends React.Component {
             answerType: this.hint.answerType,
             precision: this.hint.precision,
             variabilization: chooseVariables(this.props.hintVars, this.props.seed),
-            questionText: this.hint.text
+            questionText: this.hint.text,
+            tolerance: this.hint.tolerance
         });
 
         if (parsed == '') {
-            toastNotifyEmpty(this.translate)
+            toastNotifyEmpty()
             return;
         }
-        
+
         this.props.submitHint(parsed, this.hint, correctAnswer, this.props.hintNum);
 
         const isCorrect = !!correctAnswer
 
-        toastNotifyCorrectness(isCorrect, reason, this.translate);
+        this.props.toggleHints(this.hintNum, this.props.hint.type)
+
+        toastNotifyCorrectness(isCorrect, reason);
 
         this.setState({
             isCorrect,
@@ -78,7 +79,6 @@ class HintTextbox extends React.Component {
     }
 
     render() {
-        const { translate } = this.props;
         const { classes, index, hintNum } = this.props;
         const { isCorrect } = this.state;
         const { debug, use_expanded_view } = this.context;
@@ -108,25 +108,9 @@ class HintTextbox extends React.Component {
                 <Grid container spacing={0} justifyContent="center" alignItems="center">
                     <Grid item xs={false} sm={false} md={4}/>
                     <Grid item xs={4} sm={4} md={1}>
-                        {this.props.type !== "subHintTextbox" && this.hint.subHints !== undefined ?
-                            <center>
-                                <IconButton aria-label="delete" onClick={this.props.toggleHints}
-                                            title="View available hints"
-                                            disabled={(use_expanded_view && debug)}
-                                            {...stagingProp({
-                                                "data-selenium-target": `hint-button-${hintIndex}`
-                                            })}
-                                >
-                                    <img src={`${process.env.PUBLIC_URL}/static/images/icons/raise_hand.png`}
-                                         alt="hintToggle"/>
-                                </IconButton>
-                            </center> :
-                            <img src={'/static/images/icons/raise_hand.png'}
-                                 alt="hintToggle"
-                                 style={{ visibility: "hidden" }}/>
-                        }
                     </Grid>
                     <Grid item xs={4} sm={4} md={2}>
+                    <br></br>
                         <center>
                             <Button className={classes.button} style={{ width: "80%" }} size="small"
                                     onClick={this.submit}
@@ -135,7 +119,7 @@ class HintTextbox extends React.Component {
                                         "data-selenium-target": `submit-button-${hintIndex}`
                                     })}
                             >
-                                {translate('problem.Submit')}
+                                Submit
                             </Button>
                         </center>
                     </Grid>
@@ -184,4 +168,4 @@ class HintTextbox extends React.Component {
     }
 }
 
-export default withStyles(styles)(withTranslation(HintTextbox));
+export default withStyles(styles)(HintTextbox);
