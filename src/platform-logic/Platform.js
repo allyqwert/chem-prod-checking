@@ -4,6 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import ProblemWrapper from "@components/problem-layout/ProblemWrapper.js";
 import LessonSelectionWrapper from "@components/problem-layout/LessonSelectionWrapper.js";
 import { withRouter } from "react-router-dom";
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import {
     coursePlans,
@@ -124,6 +125,19 @@ class Platform extends React.Component {
             this.context.problemID = "n/a";
         }
     }
+
+    getProgressBarData() {
+    if (!this.lesson) return { completed: 0, total: 0, percent: 0 };
+
+    const lessonName = String(this.lesson.name.replace("Lesson ", "") + " " + this.lesson.topics);
+    const problems = this.problemIndex.problems.filter(
+        ({ lesson }) => String(lesson).includes(lessonName)
+    );
+    const completed = this.completedProbs.size;
+    const total = problems.length;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { completed, total, percent };
+}
     
     async selectLesson(lesson, updateServer=true) {
         const context = this.context;
@@ -473,6 +487,20 @@ class Platform extends React.Component {
                         </Grid>
                     </Toolbar>
                 </AppBar>
+                {/* Progress Bar */}
+{this.lesson && (
+    <div style={{ padding: "10px 20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+            <span>Progress</span>
+            <span>{this.getProgressBarData().percent}% ({this.getProgressBarData().completed}/{this.getProgressBarData().total})</span>
+        </div>
+        <LinearProgress
+            variant="determinate"
+            value={this.getProgressBarData().percent}
+            style={{ height: 10, borderRadius: 5 }}
+        />
+    </div>
+)}
                 {this.state.status === "courseSelection" ? (
                     <LessonSelectionWrapper
                         selectLesson={this.selectLesson}
