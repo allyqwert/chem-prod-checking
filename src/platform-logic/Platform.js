@@ -291,6 +291,15 @@ class Platform extends React.Component {
         seed = Date.now().toString();
         this.setState({ seed: seed });
         this.props.saveProgress();
+
+        if (this.lesson.topics == "Atom, Conversion, Stoichiometry (Module A)" && !this.completedProbs.has("a041b61EmailAddress")) {
+            const preambleProblem = this.problemIndex.problems.find(p => p.id === "a041b61EmailAddress");
+            if (preambleProblem) {
+                this.setState({ currProblem: preambleProblem, status: "learning" });
+                return preambleProblem;
+            }
+        }
+        
         const problems = this.problemIndex.problems.filter(
             ({ courseName }) => !courseName.toString().startsWith("!!")
         );

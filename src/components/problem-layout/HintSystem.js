@@ -41,17 +41,17 @@ class HintSystem extends React.Component {
 
         this.state = {
             latestStep: 0,
-            currentExpanded: (this.unlockFirstHint || this.isIncorrect) ? 0 : -1,
+            currentExpanded: -1,
             hintAnswer: "",
             showSubHints: new Array(this.props.hints.length).fill(false),
             subHintsFinished: subHintsFinished,
         };
 
-        if (this.unlockFirstHint && this.props.hintStatus.length > 0) {
-            this.props.unlockHint(0, this.props.hints[0].type);
-        } else if (this.giveHintOnIncorrect && this.isIncorrect && this.props.hintStatus.length > 0) {
-            this.props.unlockHint(0, this.props.hints[0].type);
-        }
+        //if (this.unlockFirstHint && this.props.hintStatus.length > 0) {
+            //this.props.unlockHint(0, this.props.hints[0].type);
+        //} else if (this.giveHintOnIncorrect && this.isIncorrect && this.props.hintStatus.length > 0) {
+           // this.props.unlockHint(0, this.props.hints[0].type);
+        //}
     }
 
     unlockHint = (event, expanded, i) => {

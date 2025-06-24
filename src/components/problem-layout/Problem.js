@@ -219,7 +219,7 @@ class Problem extends React.Component {
 
     answerMade = async (cardIndex, kcArray, isCorrect, stepId) => {
         const { stepStates, firstAttempts } = this.state;
-        const { lesson, problem, completedSteps, updateCompletedSteps } = this.props;
+        const { lesson, problem, completedSteps } = this.props;
 
         console.debug(`answer made and is correct: ${isCorrect}`);
 
@@ -258,8 +258,6 @@ class Problem extends React.Component {
             if(stepId) {
                 newCompletedSteps.add(stepId);
             }
-    
-            await updateCompletedSteps(newCompletedSteps);
 
             const objectives = Object.keys(lesson.learningObjectives);
             objectives.unshift(0);
@@ -419,6 +417,14 @@ class Problem extends React.Component {
             this.getOerLicense();
         if (problem == null) {
             return <div></div>;
+        }
+
+        if (problem.id == 'a041b61EmailAddress') {
+            this.giveStuHints = false
+            this.giveStuFeedback=false
+        } else {
+            this.giveStuHints = true
+            this.giveStuFeedback=true
         }
 
         return (
