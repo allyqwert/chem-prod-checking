@@ -1,0 +1,13 @@
+{
+    "id": "af9a055chem4a",
+    "stepAnswer": [
+        "$$2550000$$"
+    ],
+    "problemType": "TextBox",
+    "stepTitle": "Scientists discover an alien artifact on Mars. They measure its length as $$8500$$ Zorgs (an alien unit of length). They know from prior research that $$1$$ Zorg $$=$$ $$2.5$$ Martian meters, $$1$$ Martian meter $$=$$ $$1.2$$ Earth meters and $$1$$ Earth meter $$=$$ $$100$$ centimeters. What is the length of the alien artifact in centimeters?",
+    "stepBody": "",
+    "answerType": "arithmetic",
+    "variabilization": {},
+    "answerLatex": "$$2550000$$",
+    "tolerance": 60000
+}

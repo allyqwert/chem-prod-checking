@@ -270,7 +270,7 @@ class Problem extends React.Component {
                 relevantKc[x] = this.bktParams[x].probMastery;
             });
 
-            //this.updateCanvas(0.0, relevantKc);
+            this.updateCanvas(this.props.progressPercent, relevantKc);
         } 
         const nextStepStates = {
             ...stepStates,

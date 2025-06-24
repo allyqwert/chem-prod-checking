@@ -1,0 +1,13 @@
+{
+    "id": "af9a055chem15a",
+    "stepAnswer": [
+        "$$43.7$$"
+    ],
+    "problemType": "TextBox",
+    "stepTitle": "What is the percentage yield of this reaction?",
+    "stepBody": "Report to one decimal place.",
+    "answerType": "arithmetic",
+    "variabilization": {},
+    "answerLatex": "$$43.7$$",
+    "tolerance": 2.0
+}

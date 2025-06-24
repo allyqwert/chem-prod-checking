@@ -1,0 +1,13 @@
+{
+    "id": "af9a055chem10a",
+    "stepAnswer": [
+        "$$213.56$$"
+    ],
+    "problemType": "TextBox",
+    "stepTitle": "Calculate the average atomic mass of Keplerium (Kp) in atomic units",
+    "stepBody": "Report to 2 digits after the decimal point.",
+    "answerType": "arithmetic",
+    "variabilization": {},
+    "answerLatex": "$$213.56$$",
+    "tolerance": 1.00
+}
