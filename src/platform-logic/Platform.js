@@ -550,7 +550,7 @@ class Platform extends React.Component {
             relevantKc[x] = context.bktParams[x]?.probMastery ?? 0;
         });
 
-        this.updateCanvas(progressPercent, relevantKc);
+        //this.updateCanvas(progressPercent, relevantKc);
 
         this._nextProblem(context);
     };
