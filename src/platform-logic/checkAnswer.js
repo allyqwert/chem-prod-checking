@@ -100,7 +100,7 @@ function convertSwedishToUS(numberString) {
  * @param questionText {string} allows for a check to see if student pasted in the answer exactly
  * @returns {[string, boolean | string, null | WrongAnswerReasons]}
  */
-function checkAnswer({ attempt, actual, answerType, precision = 5, variabilization = {}, questionText = "", tolerance = 0}) {
+function checkAnswer({ attempt, actual, answerType, precision = 400, variabilization = {}, questionText = "", tolerance = 0}) {
     let parsed = attempt.replace(/\s+/g, '');
     if (variabilization) {
         actual = actual.map((actualAns) => variabilize(actualAns, variabilization));
@@ -154,17 +154,10 @@ function checkAnswer({ attempt, actual, answerType, precision = 5, variabilizati
                     // ignored
                 }
 
-                let correctAnswers = _parseEquality(parsed, actual.map((actualAns) => parse(actualAns).expr));
-
-                if (correctAnswers.length > 0) {
-                    return [parsed.print(), correctAnswers[0], null]
-                }
-
-                correctAnswers = actual.filter(stepAns => {
+                let correctAnswers = actual.filter(stepAns => {
                     const parsedStepAns = parse(stepAns).expr;
                     const difference = Math.abs(parsed.eval() - parsedStepAns.eval());
-                    const roundedDifference = Math.round(difference * 1000) / 1000;
-                    return roundedDifference <= tolerance;
+                    return difference <= tolerance;
                 });
 
                 if (correctAnswers.length > 0) {
@@ -188,7 +181,10 @@ function checkAnswer({ attempt, actual, answerType, precision = 5, variabilizati
         } else {
             // guess it is a number problem
             parsed = +attempt;
-            const correctAnswers = _equality(round(parsed, precision), actual.map((actualAns) => round(+actualAns, precision)));
+            const correctAnswers = actual.filter(actualAns => {
+                const difference = Math.abs(parsed - (+actualAns));
+                return difference <= tolerance;
+            });
 
             if (correctAnswers.length > 0) {
                 return [parsed, correctAnswers[0], null]
