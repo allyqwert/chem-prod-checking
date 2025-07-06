@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "id": "ae50654c2_2a-h1",
+    "type": "hint",
+    "dependencies": [],
+    "title": "Recall Electron vs. Molecular Geometry",
+    "text": "Remember: electron geometry considers all electron groups (including lone pairs), while molecular geometry considers only the positions of atoms.",
+    "variabilization": {},
+    "oer": "",
+    "license": ""
+  },
+  {
+    "id": "ae50654c2_2a-h2",
+    "type": "hint",
+    "dependencies": ["ae50654c2_2a-h1"],
+    "title": "Carbon Atom A",
+    "text": "Look at Carbon A: it has four single bonds. What geometry does this correspond to?",
+    "variabilization": {},
+    "oer": "",
+    "license": ""
+  },
+  {
+    "id": "ae50654c2_2a-h3",
+    "type": "hint",
+    "dependencies": ["ae50654c2_2a-h1"],
+    "title": "Nitrogen Atom B",
+    "text": "Nitrogen B has three bonding pairs and one lone pair. What is its electron geometry? What is its molecular shape?",
+    "variabilization": {},
+    "oer": "",
+    "license": ""
+  },
+  {
+    "id": "ae50654c2_2a-h4",
+    "type": "hint",
+    "dependencies": ["ae50654c2_2a-h1"],
+    "title": "Carbon Atom C",
+    "text": "Carbon C is double-bonded to oxygen and has two single bonds. Count the electron groups and identify the geometries.",
+    "variabilization": {},
+    "oer": "",
+    "license": ""
+  }
+]
