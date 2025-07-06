@@ -156,6 +156,7 @@ function checkAnswer({ attempt, actual, answerType, precision = 400, variabiliza
 
                 let correctAnswers = actual.filter(stepAns => {
                     const parsedStepAns = parse(stepAns).expr;
+                    console.log(stepAns)
                     const difference = Math.abs(parsed.eval() - parsedStepAns.eval());
                     return difference <= tolerance;
                 });

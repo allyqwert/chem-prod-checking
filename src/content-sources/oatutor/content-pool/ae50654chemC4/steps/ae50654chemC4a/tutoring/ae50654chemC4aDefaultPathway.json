@@ -23,9 +23,10 @@
         "id": "ae50654chemC4a-h3",
         "type": "scaffold",
         "problemType": "TextBox",
-        "answerType": "arithmetic",
+        "answerType": "string",
         "hintAnswer": [
-            "$$+1$$"
+            "+1",
+            "-1"
         ],
         "dependencies": [
             "ae50654chemC4a-h1"

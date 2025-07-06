@@ -34,6 +34,7 @@
                 "allowRecycle": false,
                 "showStuMastery": false,
                 "doMasteryUpdate": false,
+                "keepMCOrder": true,
                 "learningObjectives": {
                     "module_c": 0.85
                 }

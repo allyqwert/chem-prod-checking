@@ -23,15 +23,16 @@
         "id": "ae50654chemC4b-h3",
         "type": "scaffold",
         "problemType": "TextBox",
-        "answerType": "arithmetic",
+        "answerType": "string",
         "hintAnswer": [
-            "$$+1$$"
+            "+1",
+            "-1"
         ],
         "dependencies": [
             "ae50654chemC4b-h1"
         ],
         "title": "Determine the Charge of the Cation",
-        "text": "What is the charge of Na in $$Na_2 SO_4$$?",
+        "text": "What is the charge of $$Na$$ in $$Na_2 SO_4$$?",
         "variabilization": {},
         "oer": "openai",
         "license": ""

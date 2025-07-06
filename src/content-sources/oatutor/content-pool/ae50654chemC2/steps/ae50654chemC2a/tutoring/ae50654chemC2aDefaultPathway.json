@@ -40,7 +40,7 @@
             "ae50654chemC2a-h2"
         ],
         "title": "Compare Ionic Sizes",
-        "text": "Rank the ions from smallest to largest: Mg**2+, Na**+, K**+, O**2-, Cl**-, Br**-.",
+        "text": "Rank the ions from smallest to largest: $$Mg**{2+}, Na**+, K**+, O**{2-}, Cl**-, Br**-$$.",
         "variabilization": {},
         "oer": "openai",
         "license": ""
@@ -53,7 +53,7 @@
             "ae50654chemC2a-h4"
         ],
         "title": "Lattice Energy Trend",
-        "text": "Does higher charge or smaller size lead to higher lattice energy?",
+        "text": "A combination of larger charge and smaller ionic size tends to have higher lattice energy.",
         "variabilization": {},
         "oer": "openai",
         "license": ""

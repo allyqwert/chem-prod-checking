@@ -8,92 +8,90 @@
                 "id": "5EAjICw4-hYrs-HQpyCZG8eX",
                 "name": "Lesson Matter,",
                 "topics": "Atom, Conversion, Stoichiometry (Module A)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1h4ntje_px91prql4lxloibtxqr0aurae/edit?tab=t.0": 0.85,
-                    "https://docs.google.com/document/d/1yuce8wfzs_r67o4ymhmqurszqp8xc0cq/edit?tab=t.0": 0.85
+                    "module_a": 0.85,
+                    "emailaddress": 0.85
                 }
             },
             {
                 "id": "5LaoYbwn-0rBC-yZQq0BsKQH",
                 "name": "Lesson Quantum",
                 "topics": "Periodic Properties (Module B)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
-                "keepMCOrder": true,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1anzwlpzddo2nwuisitgq_e73tqxcpqha/edit?tab=t.0": 0.85,
-                    "https://docs.google.com/document/d/1ymkp18kcsijuc05nvrikmjhd3ryefat2/edit?tab=t.0": 0.85
+                    "module_b": 0.85
                 }
             },
             {
-                "id": "6HxdI5jL-zKeC-M4qLarHoOt",
+                "id": "3Pmnug8X-xsFr-PE4JhlgObT",
                 "name": "Lesson Bonding",
                 "topics": "Shape Polarity (Module C)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
+                "keepMCOrder": true,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1anzwlpzddo2nwuisitgq_e73tqxcpqha/edit?tab=t.0": 0.85,
-                    "https://docs.google.com/document/d/1anzwlpzddo2nwuisitgq_e73tqxcpqha/edit?usp=sharing&ouid=115269912370320815564&rtpof=true&sd=true": 0.85
+                    "module_c": 0.85
                 }
             },
             {
                 "id": "6bWAlZvT-nZSZ-IEkU1XQjdr",
                 "name": "Lesson Hybridization,",
                 "topics": "Gas Law, IMF (Module D)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1yuce8wfzs_r67o4ymhmqurszqp8xc0cq/edit?tab=t.0": 0.85
+                    "module_d": 0.85
                 }
             },
             {
                 "id": "6stdrokl-zPk5-xkqIw7jgXb",
                 "name": "Lesson Thermochemistry",
                 "topics": "(Module E)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1yydfusiunbbxeugllctb1z3xxypuba1c/edit": 0.85
+                    "module_e": 0.85
                 }
             },
             {
                 "id": "4WkmxbLD-3JLs-JvdkZGQ83A",
                 "name": "Lesson Chemical",
                 "topics": "Equilibrium (Module F)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1crwvktuonobs7aygx7mwqxfuyj0lxini/edit": 0.85
+                    "module_f": 0.85
                 }
             },
             {
                 "id": "6HOEluOC-9OWI-PXB3LmHnGc",
                 "name": "Lesson Acid",
                 "topics": "Base (Module G)",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/1fxqwmc7gtarylo57yf7t2c1hn0y2mkrx/edit?tab=t.0#heading=h.ir3utjxj58lv": 0.85
+                    "module_g": 0.85
                 }
             },
             {
                 "id": "0evvQx33-Qsj3-8i410O2lNq",
                 "name": "Lesson Electrochemistry",
-                "doMasteryUpdate": false,
-                "showStuMastery": false,
                 "topics": "(Module H)",
                 "allowRecycle": false,
+                "showStuMastery": false,
+                "doMasteryUpdate": false,
                 "learningObjectives": {
-                    "https://docs.google.com/document/d/14dg39bh8q55pm3j4gmtzjack3zvjhx5u/edit?tab=t.0#heading=h.fg7tf15mkyvi": 0.85
+                    "module_h": 0.85
                 }
             }
         ]

@@ -40,7 +40,7 @@ class ProblemCard extends React.Component {
 
     constructor(props, context) {
         super(props);
-        // console.log("problem lesson props:", props);
+        console.log("problem lesson props:", props);
         this.step = props.step;
         this.index = props.index;
         this.giveStuFeedback = props.giveStuFeedback;
@@ -109,7 +109,10 @@ class ProblemCard extends React.Component {
                             "-s" +
                             (hint.subHints.length + 1),
                         title: "Answer",
-                        text: "The answer is " + hint.hintAnswer[0],
+                        text:
+                            "The answer is " +
+                            hint.hintAnswer[0] +
+                            (hint.hintAnswer[1] ? " or " + hint.hintAnswer[1] : ""),
                         type: "bottomOut",
                         dependencies: Array.from(
                             Array(hint.subHints.length).keys()
