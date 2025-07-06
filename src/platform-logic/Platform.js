@@ -543,14 +543,20 @@ class Platform extends React.Component {
             );
         });
         
-        const progressPercent = this.getProgressBarData().percent / 100;
-
         const relevantKc = {};
         Object.keys(this.lesson.learningObjectives).forEach((x) => {
             relevantKc[x] = context.bktParams[x]?.probMastery ?? 0;
         });
 
-        //this.updateCanvas(progressPercent, relevantKc);
+        // Check if all problems are completed or all skills are mastered
+        const progressData = this.getProgressBarData();
+        const progressPercent = progressData.percent / 100;
+        const allProblemsCompleted = progressData.completed === progressData.total;
+
+        if (allProblemsCompleted) {
+            console.debug("updateCanvas called because lesson is complete");
+            this.updateCanvas(progressPercent, relevantKc);
+        }
 
         this._nextProblem(context);
     };
