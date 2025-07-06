@@ -136,36 +136,62 @@ function checkAnswer({ attempt, actual, answerType, precision = 400, variabiliza
 
                 return [attempt, false, WrongAnswerReasons.wrong]
             } else {
+                // Validate and parse student attempt
                 attempt = validateAndCorrectFormat(attempt);
-                parsed = parse(attempt).expr;
-                if (IS_STAGING_OR_DEVELOPMENT) {
-                    console.debug("checkAnswer.js: Using KAS to compare answer with solution", "attempt", attempt, "actual", actual, "parsed", parsed)
 
-                    console.debug("checkAnswer.js: questionText vs attempt", questionText, "vs", attempt)
+                let parsedAttemptExpr;
+                let parseAttemptError = false;
+
+                try {
+                    parsedAttemptExpr = parse(attempt).expr;
+                } catch (err) {
+                    parseAttemptError = true;
                 }
 
-                // try to see if student paste in exact question
+                if (IS_STAGING_OR_DEVELOPMENT) {
+                    console.debug("checkAnswer.js: Using KAS to compare answer with solution", "attempt", attempt, "actual", actual);
+                    console.debug("checkAnswer.js: questionText vs attempt", questionText, "vs", attempt);
+                }
+
+                // try to see if student pasted in exact question
                 try {
-                    const questionTextRepr = parse(questionText).expr.repr()
-                    if (questionTextRepr === parsed.repr()) {
-                        return [parsed.print(), false, WrongAnswerReasons.sameAsProblem];
+                    const questionTextRepr = parse(questionText).expr.repr();
+                    if (questionTextRepr === parsedAttemptExpr?.repr?.()) {
+                        return [attempt, false, WrongAnswerReasons.sameAsProblem];
                     }
                 } catch (_) {
                     // ignored
                 }
 
+                if (parseAttemptError || !parsedAttemptExpr) {
+                    // Fallback: treat as string comparison
+                    const correctAnswers = actual.filter(ans => attempt.trim() === ans.trim());
+                    if (correctAnswers.length > 0) {
+                        return [attempt, correctAnswers[0], null];
+                    }
+                    return [attempt, false, WrongAnswerReasons.wrong];
+                }
+
+                // Normal numeric comparison
                 let correctAnswers = actual.filter(stepAns => {
-                    const parsedStepAns = parse(stepAns).expr;
-                    console.log(stepAns)
-                    const difference = Math.abs(parsed.eval() - parsedStepAns.eval());
+                    let parsedStepAnsExpr;
+                    try {
+                        parsedStepAnsExpr = parse(stepAns).expr;
+                    } catch (err) {
+                        return false; // Can't parse solution either
+                    }
+                    if (!parsedStepAnsExpr) {
+                        return false;
+                    }
+                    const difference = Math.abs(parsedAttemptExpr.eval() - parsedStepAnsExpr.eval());
                     return difference <= tolerance;
                 });
 
                 if (correctAnswers.length > 0) {
-                    return [parsed.print(), correctAnswers[0], null];
+                    return [parsedAttemptExpr.print(), correctAnswers[0], null];
                 }
 
-                return [parsed.print(), false, WrongAnswerReasons.wrong];
+                return [parsedAttemptExpr.print(), false, WrongAnswerReasons.wrong];
             }
 
         } else if (answerType === "string") {
