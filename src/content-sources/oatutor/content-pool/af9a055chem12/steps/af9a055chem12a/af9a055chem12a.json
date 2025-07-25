@@ -5,9 +5,8 @@
     ],
     "problemType": "TextBox",
     "stepTitle": "What mass of oxygen gas, O2, from the air is consumed in the combustion of $$702$$ g of octane, C8H18, one of the principal components of gasoline? Round to the nearest gram.",
-    "stepBody": "Input a whole number.",
+    "stepBody": "",
     "answerType": "arithmetic",
     "variabilization": {},
-    "answerLatex": "$$2458$$",
-    "tolerance": 50
+    "answerLatex": "$$2458$$"
 }

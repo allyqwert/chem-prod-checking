@@ -9,9 +9,9 @@
     "answerType": "string",
     "variabilization": {},
     "choices": [
-        "$$Dipole-Dipole$$",
+        "Dipole $$-$$ Dipole",
         "Hydrogen Bonding",
         "London Dispersion",
-        "$$Ion-Dipole$$"
+        "Ion $$-$$ Dipole"
     ]
 }

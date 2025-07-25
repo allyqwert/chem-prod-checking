@@ -1,13 +1,17 @@
 {
     "id": "a0afc81chem1a",
     "stepAnswer": [
-        "$$0.000000000000000000339$$"
+        "$$3.39$$ $$x$$ $${10}^{-19}$$ J"
     ],
-    "problemType": "TextBox",
-    "stepTitle": "When a metal was exposed to photons at a frequency of $$1.04\u00d710^{15}$$ $$s^{-1}$$, electrons were emitted with a maximum kinetic energy of $$3.50\u00d710^{-19}$$ J. Calculate the work function, \u03a6, of this metal in Joules.",
-    "stepBody": "Two digits after decimal.",
-    "answerType": "arithmetic",
+    "problemType": "MultipleChoice",
+    "stepTitle": "When a metal was exposed to photons at a frequency of $$1.04\u00d71015$$ s-1, electrons were emitted with a maximum kinetic energy of $$3.50\u00d710-19$$ J. Calculate the work function, \u03a6, of this metal.",
+    "stepBody": "",
+    "answerType": "string",
     "variabilization": {},
-    "answerLatex": "$$0.000000000000000000339$$",
-    "tolerance": 0.00000000000000000005
+    "answerLatex": "$$3.39$$ $$x$$ $${10}^{-19}$$ J",
+    "choices": [
+        "$$3.36$$ $$x$$ $${10}^{-19}$$ J",
+        "$$3.39$$ $$x$$ $${10}^{-19}$$ J",
+        "$$3.42$$ $$x$$ $${10}^{-19}$$ J"
+    ]
 }

@@ -1,7 +1,7 @@
 {
     "id": "a1797b7chem20b",
     "stepAnswer": [
-        "$$Dipole-dipole$$"
+        "Dipole $$-$$ dipole"
     ],
     "problemType": "MultipleChoice",
     "stepTitle": "Select the predominant IMF",
@@ -9,7 +9,7 @@
     "answerType": "string",
     "variabilization": {},
     "choices": [
-        "$$Dipole-dipole$$",
+        "Dipole $$-$$ dipole",
         "Hydrogen Bonding",
         "London Dispersion"
     ]

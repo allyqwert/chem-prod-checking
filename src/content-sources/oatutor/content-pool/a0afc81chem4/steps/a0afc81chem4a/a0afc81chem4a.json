@@ -1,13 +1,18 @@
 {
     "id": "a0afc81chem4a",
     "stepAnswer": [
-        "$$102.52$$"
+        "$$102.52$$ nm"
     ],
-    "problemType": "TextBox",
+    "problemType": "MultipleChoice",
     "stepTitle": "",
-    "stepBody": "Two digits after decimal.",
-    "answerType": "arithmetic",
+    "stepBody": "",
+    "answerType": "string",
     "variabilization": {},
-    "answerLatex": "$$102.52$$",
-    "tolerance": 5.00
+    "answerLatex": "$$102.52$$ nm",
+    "choices": [
+        "$$102.52$$ nm",
+        "$$102.52$$ mm",
+        "$$67.52$$ nm",
+        "$$67.52$$ mm"
+    ]
 }

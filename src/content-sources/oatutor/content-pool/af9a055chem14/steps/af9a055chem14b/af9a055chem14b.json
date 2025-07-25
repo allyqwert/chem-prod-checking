@@ -5,9 +5,8 @@
     ],
     "problemType": "TextBox",
     "stepTitle": "What is the amount of CO2 formed in this reaction in grams?",
-    "stepBody": "Report to one decimal place.",
+    "stepBody": "",
     "answerType": "arithmetic",
     "variabilization": {},
-    "answerLatex": "$$102.5$$",
-    "tolerance": 5.0
+    "answerLatex": "$$102.5$$"
 }
