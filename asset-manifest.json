@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/chem-prod-checking/static/css/main.4065b524.css",
-    "main.js": "/chem-prod-checking/static/js/main.7438680e.js",
+    "main.js": "/chem-prod-checking/static/js/main.783ada30.js",
     "static/media/Symbola.svg": "/chem-prod-checking/static/media/Symbola.f647c9292a2da02d9ae8.svg",
     "static/media/Symbola.eot": "/chem-prod-checking/static/media/Symbola.d25fbd520f6558203fb4.eot",
     "static/media/Symbola.ttf": "/chem-prod-checking/static/media/Symbola.1ac5fa7f9b82ed4ce3f3.ttf",
@@ -9,10 +9,10 @@
     "static/media/Symbola.woff2": "/chem-prod-checking/static/media/Symbola.080d8bb6a36e8bd8966b.woff2",
     "index.html": "/chem-prod-checking/index.html",
     "main.4065b524.css.map": "/chem-prod-checking/static/css/main.4065b524.css.map",
-    "main.7438680e.js.map": "/chem-prod-checking/static/js/main.7438680e.js.map"
+    "main.783ada30.js.map": "/chem-prod-checking/static/js/main.783ada30.js.map"
   },
   "entrypoints": [
     "static/css/main.4065b524.css",
-    "static/js/main.7438680e.js"
+    "static/js/main.783ada30.js"
   ]
 }
